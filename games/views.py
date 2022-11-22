@@ -2,15 +2,19 @@ from django.shortcuts import render, redirect, get_object_or_404
 from random import *
 from .models import Weapon, Character, Enemy
 from .forms import WeaponForm, CharacterForm
-from django.views.decorators.http import require_POST
+# [미션] 자유롭게 코드 작성
+# [미션] 코드에 필요한 모듈 불러오기
+
 
 # Create your views here.
 win = 0
 draw = 0
 lose = 0
 
+# 무기 생성 함수
 def weapon_generate():
-    # 무기는 자유롭게 변경 가능
+    # 추가하고 싶은 무기가 있다면 추가 가능
+    # weapons 딕셔너리의 key 값은 무기 이름, value 값은 무기 공격력
     weapons = {
         '주먹도끼': 2,
         '가벼운 물총': 3,
@@ -18,23 +22,29 @@ def weapon_generate():
         '수상한 막대기': 7,
         '수학의 정석': 9,
     }
+    # weapon_name에는 weapons 딕셔너리의 key 값이 저장됨
     for weapon_name in weapons:
+        # weapon_name에 해당하는 무기가 없는 경우 새로운 Weapon 객체 생성
         if Weapon.objects.filter(name=weapon_name).count() == 0:
             Weapon.objects.create(
                 name = weapon_name,
                 power = weapons[weapon_name],
             )
 
+# 적 생성 함수
 def enemy_generate():
+    # 추가하고 싶은 적이 있다면 추가 가능
+    # enemies 딕셔너리의 key 값은 적 이름, value 값은 적 hp
     enemies = {
-        # 종이 시리즈
         '흩날리는 종이': 10,
         '뒤집어진 냄비': 25,
         '수수한 독버섯': 50,
         '수학 공식': 85,
         '아기 용': 100,
     }
+    # enemy_name에는 enemies 딕셔너리의 key 값이 저장됨
     for enemy_name in enemies:
+        # enemy_name에 해당하는 적이 없는 경우 새로운 Enemy 객체 생성
         if Enemy.objects.filter(name=enemy_name).count() == 0:
             Enemy.objects.create(
                 name = enemy_name,
@@ -42,7 +52,9 @@ def enemy_generate():
             )
 
 def game_list(request):
+    # 무기를 생성할 필요가 없는 경우 weapon_generate() 함수를 주석으로 달아놓기
     weapon_generate()
+    # 적을 생성할 필요가 없는 경우 enemy_generate() 함수를 주석으로 달아놓기
     enemy_generate()
     return render(request, 'games/game_list.html')
 
@@ -147,18 +159,20 @@ def adventure_home(request):
     else:
         return redirect('accounts:login')
 
-@require_POST
 def weapon_get(request):
-    character = get_object_or_404(Character, user=request.user)
+    if request.method == 'POST':
+        character = get_object_or_404(Character, user=request.user)
 
-    weapon_id = request.POST.get('random-weapon')
-    selected_weapon = get_object_or_404(Weapon, id=weapon_id)
-    
-    character.weapon = selected_weapon
-    character.save()
+        weapon_id = request.POST.get('random-weapon')
+        selected_weapon = get_object_or_404(Weapon, id=weapon_id)
+        
+        character.weapon = selected_weapon
+        character.save()
     return redirect('games:adventure_home')
 
+# 모험 떠나기
 def adventure_attack(request):
+    # 랜덤 적 생성
     random_enemy = Enemy.objects.order_by('?')[0]
     
     context = {
@@ -166,29 +180,20 @@ def adventure_attack(request):
     }
     return render(request, 'games/adventure_attack.html', context)
 
-@require_POST
 def adventure_attack_result(request):
+    # 로그인 한 유저의 캐릭터
     character = get_object_or_404(Character, user=request.user)
 
+    # 캐릭터와 마주친 랜덤 적
     enemy_id = request.POST.get('random-enemy')
     enemy = get_object_or_404(Enemy, id=enemy_id)
-
-    if character.weapon.power*10 >= enemy.hp:
-        result = '승리'
-        reward_coin = randint(enemy.hp*10-5, enemy.hp*10+5)
-        character.coin += reward_coin
-        character.save()
-    else:
-        result = '패배'
-        reward_coin = 0
     
-    context = {
-        'enemy': enemy,
-        'result': result,
-        'reward_coin' : reward_coin,
-    }
-    return render(request, 'games/adventure_attack_result.html', context)
+    # [미션] 자유롭게 코드 작성
+    # [미션] 필요 시 context 작성 후 html 페이지에 전달
 
+    return render(request, 'games/adventure_attack_result.html')
+
+# 무기 공방
 def weapon_workroom(request):
     character = get_object_or_404(Character, user=request.user)
 
@@ -199,39 +204,6 @@ def weapon_workroom(request):
     }
     return render(request, 'games/weapon_workroom.html', context)
 
-@require_POST
-def weapon_pick(request):
-    character = get_object_or_404(Character, user=request.user)
-    # 캐릭터가 갖고 있는 코인 저장
-    character_coin = character.coin
-    
-    # 캐릭터가 500코인 이상 갖고 있는 경우
-    if character_coin >= 500:
-        # 500코인 소모
-        character.coin = character_coin - 500
-        character.save()
+# [미션] 자유롭게 코드 작성
+# [미션] 무기 뽑기, 교체 등의 기능을 가진 함수 구현
 
-        random_weapon = Weapon.objects.order_by('?')[0]
-
-        context = {
-            'character': character,
-            'weapon_name': character.weapon.name,
-            'weapon_power': character.weapon.power,
-            'random_weapon': random_weapon,
-        }
-        return render(request, 'games/weapon_change.html', context)
-    return redirect('games:weapon_workroom')
-
-
-def weapon_change(request):
-    character = get_object_or_404(Character, user=request.user)
-
-    # 랜덤으로 선택된 무기 id 가져오기
-    weapon_id = request.POST.get('random-weapon')
-    selected_weapon = get_object_or_404(Weapon, id=weapon_id)
-
-    # 캐릭터에 새 무기 장착
-    character.weapon = selected_weapon
-    character.save()
-
-    return redirect('games:weapon_workroom')
