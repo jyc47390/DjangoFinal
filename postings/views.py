@@ -141,6 +141,7 @@ def posting_detail(request, posting_id):
     }
     return render(request, 'postings/posting_detail.html', context)
 
+# [코드 작성] login_required 데코레이션 추가
 @login_required
 def posting_update(request, posting_id):
     posting = get_object_or_404(Posting, id=posting_id)
@@ -167,8 +168,9 @@ def posting_update(request, posting_id):
 # [코드 작성] require_POST 데코레이션 추가
 @require_POST
 def posting_delete(request, posting_id):
-    # [코드 작성] 글(posting) 작성자(author)가 로그인한 사람(request.user)과 같을 경우에만 글 삭제가 가능하도록 조건문 작성
     posting = get_object_or_404(Posting, id=posting_id)
+    # [코드 작성] 글(posting) 작성자(author)가 로그인한 사람(request.user)과 같을 경우에만 글 삭제가 가능하도록 조건문 작성
+    # [미션] True를 지우고 작성
     if posting.author == request.user:
         posting.delete()
         return redirect('postings:posting_list')
@@ -182,6 +184,7 @@ def posting_delete(request, posting_id):
 def comment_delete(request, posting_id, comment_id):
     comment = get_object_or_404(Comment, id=comment_id)
     # [코드 작성] 댓글(comment) 작성자(author)가 로그인한 사람(request.user)과 같을 경우에만 댓글 삭제가 가능하도록 조건문 작성
+    # [미션] True를 지우고 작성
     if comment.author == request.user:
         comment.delete()
     return redirect('postings:posting_detail', posting_id)
