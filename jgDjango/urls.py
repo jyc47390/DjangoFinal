@@ -27,7 +27,3 @@ urlpatterns = [
     path('games/', include('games.urls')),
     path('accounts/', include('accounts.urls')),
 ]
-
-# [코드 작성] DEBUG가 False일 경우 static을 가져올 수 있도록 설정
-if settings.DEBUG == False:
-    urlpatterns += re_path(r'^static/(?P<path>.*)$', serve, {'document_root': settings.STATIC_ROOT}),
