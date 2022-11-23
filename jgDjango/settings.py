@@ -22,7 +22,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # [코드 작성] 가상환경 관련 설정
 env = environ.Env(DEBUG=(bool, True))
 environ.Env.read_env(
-    env_file=os.path.join(BASE_DIR, ',env')
+    env_file=os.path.join(BASE_DIR, '.env')
 )
 
 # Quick-start development settings - unsuitable for production
