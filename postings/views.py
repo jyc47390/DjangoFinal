@@ -43,6 +43,9 @@ def posting_list(request):
     # page가 선택되지 않았을 경우에는 '1'로 설정
     if page == None:
         page = '1'
+    # 존재하지 않는 경로로 접근하는 경우 404페이지로 반환
+    elif page == '0' or not page.isdecimal():
+        return render(request, '404.html')
 
     # 화면에 보여질 페이지 개수 설정
     count = 5
@@ -53,6 +56,8 @@ def posting_list(request):
     last_page = postings_num // 10
     if postings_num % 10 != 0:
         last_page + 1
+    if recent_page > last_page:
+        return render(request, '404.html')
     
     # '이전' 버튼을 눌렀을 때 이동할 페이지 번호 계산
     previous_page = ((recent_page-1)//count)*count
