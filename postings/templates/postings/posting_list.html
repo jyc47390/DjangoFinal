@@ -22,7 +22,7 @@
       </tr>
       {% for posting in page_postings %}
         <tr>
-          <td class="index">{{page_postings_start_index|add:-10|add:forloop.revcounter}}</td>
+          <td class="index">{{page_postings_start_index|add:recent_page_count|add:forloop.revcounter}}</td>
           <td class="title"><a href="{% url 'postings:posting_detail' posting.id %}">{{posting.title}}</a></td>
           <td class="author">{{posting.author.username}}</td>
           <td class="date">{{posting.date|date:'Y-m-d'}}</td>
