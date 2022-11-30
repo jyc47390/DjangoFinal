@@ -243,7 +243,7 @@ def weapon_pick(request):
         return render(request, 'games/weapon_change.html', context)
     return redirect('games:weapon_workroom')
 
-
+@require_POST
 def weapon_change(request):
     character = get_object_or_404(Character, user=request.user)
 
