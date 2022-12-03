@@ -21,6 +21,11 @@ def weapon_generate():
         '낡은 검': 5,
         '수상한 막대기': 7,
         '수학의 정석': 9,
+        '구닥다리 총': 14,
+        '머신건': 94,
+        '발버둥':1,
+        '주먹': 1,
+        '레이저 검': 71,
     }
     # weapon_name에는 weapons 딕셔너리의 key 값이 저장됨
     for weapon_name in weapons:
@@ -41,6 +46,8 @@ def enemy_generate():
         '수수한 독버섯': 50,
         '수학 공식': 85,
         '아기 용': 100,
+        '정년퇴직': 1700,
+        '죽음': 1900,
     }
     # enemy_name에는 enemies 딕셔너리의 key 값이 저장됨
     for enemy_name in enemies:
@@ -172,9 +179,13 @@ def weapon_get(request):
 
 # 모험 떠나기
 def adventure_attack(request):
-    # 랜덤 적 생성
-    random_enemy = Enemy.objects.order_by('?')[0]
-    
+    # 랜덤 적 생성0
+    random_enemy = Enemy.objects.filter(hp__lte=100).order_by('?')[0]
+
+    character = get_object_or_404(Character, user=request.user)
+    if character.count >= 50:
+        random_enemy = Enemy.objects.order_by('?')[0]
+
     context = {
         'random_enemy': random_enemy,
     }
@@ -195,6 +206,7 @@ def adventure_attack_result(request):
         result = '승리'
         reward_coin = randint(enemy.hp*10-5, enemy.hp*10+5)
         character.coin += reward_coin
+        character.count += 1
         character.save()
     else:
         result = '패배'

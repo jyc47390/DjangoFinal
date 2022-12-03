@@ -21,13 +21,13 @@ textarea {
   padding: 10px;
   border: 1px solid;
   border-radius: 5px;
-  font-family: 'GangwonEdu_OTFBoldA';
+  font-family: 'BMEuljirooraeorae';
   font-size: 1rem;
   resize: vertical;
 }
 
 input[type=submit] {
-  font-family: 'GangwonEdu_OTFBoldA';
+  font-family: 'BMEuljirooraeorae';
   font-size: 1rem;
   cursor: pointer;
 }
